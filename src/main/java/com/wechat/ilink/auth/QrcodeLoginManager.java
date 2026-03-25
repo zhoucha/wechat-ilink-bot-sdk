@@ -52,7 +52,6 @@ public class QrcodeLoginManager {
      * @return 登录成功的凭据
      */
     public Credentials pollQrcodeStatus(String qrcodeToken, QrcodeStatusCallback callback) throws IOException, InterruptedException, AuthException, QrcodeTimeoutException {
-        long startTime = System.currentTimeMillis();
         long timeout = config.getQrcodeTimeoutMs();
         long pollInterval = config.getQrcodePollIntervalMs();
 
@@ -158,16 +157,12 @@ public class QrcodeLoginManager {
         } catch (ExecutionException e) {
             // 将内部异常解包并抛出
             Throwable cause = e.getCause();
-            if (cause instanceof IOException) {
-                throw (IOException) cause;
-            } else if (cause instanceof AuthException) {
-                throw (AuthException) cause;
-            } else if (cause instanceof QrcodeTimeoutException) {
-                throw (QrcodeTimeoutException) cause;
-            } else if (cause instanceof InterruptedException) {
-                throw (InterruptedException) cause;
-            } else {
-                throw new RemoteException("Unexpected error", cause);
+            switch (cause) {
+                case IOException ioException -> throw ioException;
+                case AuthException authException -> throw authException;
+                case QrcodeTimeoutException qrcodeTimeoutException -> throw qrcodeTimeoutException;
+                case InterruptedException interruptedException -> throw interruptedException;
+                case null, default -> throw new RemoteException("Unexpected error", cause);
             }
         } finally {
             // 关闭线程池
