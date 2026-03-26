@@ -61,10 +61,10 @@ public class MessageListenerService implements AutoCloseable {
      */
     public void start() {
         if (running.compareAndSet(false, true)) {
-            listenerThread = new Thread(this::runLoop, "message-listener");
-            listenerThread.setDaemon(true);
-            listenerThread.start();
-            logger.info("Message listener service started");
+            listenerThread = Thread.ofVirtual()
+                    .name("message-listener")
+                    .start(this::runLoop);
+            logger.info("消息监听服务启动成功!");
         }
     }
 
@@ -77,7 +77,7 @@ public class MessageListenerService implements AutoCloseable {
                 listenerThread.interrupt();
                 listenerThread = null;
             }
-            logger.info("Message listener service stopped");
+            logger.info("消息监听启动停止成功!");
         }
     }
 
@@ -114,13 +114,12 @@ public class MessageListenerService implements AutoCloseable {
                                 userMessages.add(msg);
                             }
                         }
-
                         if (!userMessages.isEmpty()) {
                             notifyMessagesReceived(userMessages);
                         }
                     }
                 } else {
-                    handleFailure(new Exception("API error: " + response.getErrorInfo()));
+                    handleFailure(new Exception("Api 错误: " + response.getErrorInfo()));
                 }
 
             } catch (Exception e) {
@@ -136,13 +135,11 @@ public class MessageListenerService implements AutoCloseable {
 
     private void handleFailure(Exception e) {
         consecutiveFailures++;
-        logger.warn("Message polling failure #{}: {}", consecutiveFailures, e.getMessage());
-
+        logger.warn("消息轮询失败 #{}: {}", consecutiveFailures, e.getMessage());
         notifyError(e);
-
         if (consecutiveFailures >= config.getMaxConsecutiveFailures()) {
             // 长时间退避
-            logger.info("Backing off for {}ms", config.getBackoffDelayMs());
+            logger.info("消息轮询退避 {}ms", config.getBackoffDelayMs());
             notifyDisconnected();
             sleep(config.getBackoffDelayMs());
             consecutiveFailures = 0;
