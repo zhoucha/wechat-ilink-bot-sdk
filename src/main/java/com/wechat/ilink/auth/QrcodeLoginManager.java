@@ -2,6 +2,7 @@ package com.wechat.ilink.auth;
 
 import com.wechat.ilink.api.IlinkApiClient;
 import com.wechat.ilink.config.SdkConfig;
+import com.wechat.ilink.exception.ApiException;
 import com.wechat.ilink.exception.AuthException;
 import com.wechat.ilink.exception.QrcodeTimeoutException;
 import com.wechat.ilink.model.auth.Credentials;
@@ -40,7 +41,7 @@ public class QrcodeLoginManager {
      *
      * @return 二维码标识
      */
-    public QrcodeResponse getQrcode() throws IOException {
+    public QrcodeResponse getQrcode() throws ApiException {
         return apiClient.getBotQrcode(SdkConfig.BOT_TYPE, Duration.ofSeconds(15));
     }
 

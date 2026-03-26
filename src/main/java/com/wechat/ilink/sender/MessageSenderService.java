@@ -3,13 +3,13 @@ package com.wechat.ilink.sender;
 import com.wechat.ilink.api.IlinkApiClient;
 import com.wechat.ilink.cache.ContextTokenCache;
 import com.wechat.ilink.config.SdkConfig;
+import com.wechat.ilink.exception.ApiException;
 import com.wechat.ilink.model.message.WechatMessage;
 import com.wechat.ilink.model.request.SendMessageRequest;
 import com.wechat.ilink.model.response.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.time.Duration;
 
 /**
@@ -36,7 +36,7 @@ public class MessageSenderService {
      * @param content  消息内容
      * @return 发送结果
      */
-    public boolean sendTextMessage(String toUserId, String content) throws IOException {
+    public boolean sendTextMessage(String toUserId, String content) throws ApiException {
         String contextToken = contextTokenCache.getOrThrow(toUserId);
         WechatMessage msg = WechatMessage.createReply(toUserId, content, contextToken);
         SendMessageRequest request = new SendMessageRequest(msg);
@@ -55,7 +55,7 @@ public class MessageSenderService {
     /**
      * 发送消息（使用自定义消息对象）
      */
-    public boolean sendMessage(WechatMessage message) throws IOException {
+    public boolean sendMessage(WechatMessage message) throws ApiException {
         if (message.getContextToken() == null) {
             message.setContextToken(contextTokenCache.getOrThrow(message.getToUserId()));
         }

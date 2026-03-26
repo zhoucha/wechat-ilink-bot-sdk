@@ -1,5 +1,6 @@
 package com.wechat.ilink.api;
 
+import com.wechat.ilink.exception.ApiException;
 import com.wechat.ilink.http.HttpClientWrapper;
 import com.wechat.ilink.model.auth.Credentials;
 import com.wechat.ilink.model.request.GetUpdatesRequest;
@@ -57,7 +58,7 @@ public class IlinkApiClient implements AutoCloseable {
      *
      * @param botType bot类型 (3为ClawBot)
      */
-    public QrcodeResponse getBotQrcode(String botType, Duration timeout) throws IOException {
+    public QrcodeResponse getBotQrcode(String botType, Duration timeout) throws ApiException {
         String url = baseUrl + "/ilink/bot/get_bot_qrcode?bot_type=" + botType;
         Map<String, String> headers = buildHeaders();
 
@@ -68,7 +69,7 @@ public class IlinkApiClient implements AutoCloseable {
     /**
      * 获取二维码状态
      */
-    public QrcodeStatusResponse getQrcodeStatus(String qrcode, Duration timeout) throws IOException {
+    public QrcodeStatusResponse getQrcodeStatus(String qrcode, Duration timeout) throws ApiException {
         String url = baseUrl + "/ilink/bot/get_qrcode_status?qrcode=" + qrcode;
         Map<String, String> headers = buildHeaders();
         headers.put("iLink-App-ClientVersion", "1");
@@ -80,7 +81,7 @@ public class IlinkApiClient implements AutoCloseable {
     /**
      * 获取消息更新（长轮询）
      */
-    public GetUpdatesResponse getUpdates(GetUpdatesRequest request, Duration timeout) throws IOException {
+    public GetUpdatesResponse getUpdates(GetUpdatesRequest request, Duration timeout) throws ApiException {
         String url = baseUrl + "/ilink/bot/getupdates";
         Map<String, String> headers = buildHeaders();
 
@@ -91,7 +92,7 @@ public class IlinkApiClient implements AutoCloseable {
     /**
      * 发送消息
      */
-    public ApiResponse sendMessage(SendMessageRequest request, Duration timeout) throws IOException {
+    public ApiResponse sendMessage(SendMessageRequest request, Duration timeout) throws ApiException {
         // 设置 client_id
         if (request.getMsg() != null && request.getMsg().getClientId() == null) {
             request.getMsg().setClientId(ClientIdGenerator.generate());
@@ -104,11 +105,11 @@ public class IlinkApiClient implements AutoCloseable {
         return parseResponse(response, ApiResponse.class);
     }
 
-    private <T> T parseResponse(String json, Class<T> clazz) throws IOException {
+    private <T> T parseResponse(String json, Class<T> clazz) throws ApiException {
         try {
             return httpClient.getObjectMapper().readValue(json, clazz);
         } catch (Exception e) {
-            throw new IOException("Failed to parse response: " + json.substring(0, Math.min(100, json.length())), e);
+            throw new ApiException("Failed to parse response: " + json.substring(0, Math.min(100, json.length())), e);
         }
     }
 

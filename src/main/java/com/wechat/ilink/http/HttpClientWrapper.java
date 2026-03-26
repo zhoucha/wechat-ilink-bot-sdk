@@ -1,5 +1,6 @@
 package com.wechat.ilink.http;
 
+import com.wechat.ilink.exception.ApiException;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
@@ -9,7 +10,6 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
-import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.util.Timeout;
@@ -51,7 +51,7 @@ public class HttpClientWrapper implements AutoCloseable {
     /**
      * 发送 GET 请求
      */
-    public String get(String url, Map<String, String> headers, Duration timeout) throws IOException {
+    public String get(String url, Map<String, String> headers, Duration timeout) throws ApiException {
         HttpGet httpGet = new HttpGet(url);
         return executeRequest(httpGet, headers, timeout);
     }
@@ -59,7 +59,7 @@ public class HttpClientWrapper implements AutoCloseable {
     /**
      * 发送 POST 请求
      */
-    public String post(String url, Map<String, String> headers, Object body, Duration timeout) throws IOException {
+    public String post(String url, Map<String, String> headers, Object body, Duration timeout) throws ApiException {
         HttpPost httpPost = new HttpPost(url);
 
         if (body != null) {
@@ -70,7 +70,7 @@ public class HttpClientWrapper implements AutoCloseable {
         return executeRequest(httpPost, headers, timeout);
     }
 
-    private String executeRequest(HttpUriRequestBase request, Map<String, String> headers, Duration timeout) throws IOException {
+    private String executeRequest(HttpUriRequestBase request, Map<String, String> headers, Duration timeout) throws ApiException {
         // 设置请求头
         if (headers != null) {
             for (Map.Entry<String, String> entry : headers.entrySet()) {
@@ -94,8 +94,8 @@ public class HttpClientWrapper implements AutoCloseable {
             String result = EntityUtils.toString(entity, StandardCharsets.UTF_8);
             EntityUtils.consume(entity);
             return result;
-        } catch (ParseException e) {
-            throw new IOException("Failed to parse response", e);
+        } catch (Exception e) {
+            throw new ApiException("Failed to parse response", e);
         }
     }
 

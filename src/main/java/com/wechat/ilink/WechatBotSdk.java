@@ -4,6 +4,7 @@ import com.wechat.ilink.api.IlinkApiClient;
 import com.wechat.ilink.auth.QrcodeLoginManager;
 import com.wechat.ilink.cache.ContextTokenCache;
 import com.wechat.ilink.config.SdkConfig;
+import com.wechat.ilink.exception.ApiException;
 import com.wechat.ilink.exception.AuthException;
 import com.wechat.ilink.exception.QrcodeTimeoutException;
 import com.wechat.ilink.listener.MessageListener;
@@ -123,7 +124,7 @@ public class WechatBotSdk implements AutoCloseable {
     /**
      * 获取登录二维码
      */
-    public QrcodeResponse getQrcode() throws IOException {
+    public QrcodeResponse getQrcode() throws ApiException {
         return loginManager.getQrcode();
     }
 
@@ -187,7 +188,7 @@ public class WechatBotSdk implements AutoCloseable {
      * @param content  消息内容
      * @return 是否发送成功
      */
-    public boolean sendTextMessage(String toUserId, String content) throws IOException {
+    public boolean sendTextMessage(String toUserId, String content) throws ApiException {
         if (!isAuthenticated()) {
             throw new IllegalStateException("微信未登录,请先扫码二维码登录");
         }
@@ -197,7 +198,7 @@ public class WechatBotSdk implements AutoCloseable {
     /**
      * 发送自定义消息
      */
-    public boolean sendMessage(WechatMessage message) throws IOException {
+    public boolean sendMessage(WechatMessage message) throws ApiException {
         if (!isAuthenticated()) {
             throw new IllegalStateException("Not authenticated. Please login first.");
         }
