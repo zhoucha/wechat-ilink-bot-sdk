@@ -1,6 +1,6 @@
 # Wechat iLink Bot SDK for Java
 
-面向对象的微信 iLink Bot SDK，支持扫码登录、消息收发、断点续传等功能。
+微信 iLink Bot SDK，支持扫码登录、消息收发、断点续传等功能。
 
 ## 特性
 
