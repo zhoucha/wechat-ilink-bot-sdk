@@ -16,21 +16,21 @@ class ClientIdGeneratorTest {
     private static final Pattern CLIENT_ID_PATTERN = Pattern.compile("client:\\d+-[0-9a-f]{8}");
 
     @Test
-    void testGenerate返回非空字符串() {
+    void testGenerateReturnsNonEmptyString() {
         String clientId = ClientIdGenerator.generate();
         assertNotNull(clientId);
         assertFalse(clientId.isEmpty());
     }
 
     @Test
-    void testGenerate返回正确格式() {
+    void testGenerateReturnsCorrectFormat() {
         String clientId = ClientIdGenerator.generate();
         assertTrue(CLIENT_ID_PATTERN.matcher(clientId).matches(),
                 "ClientId格式应为 client:{timestamp}-{4字节随机hex}, 实际: " + clientId);
     }
 
     @Test
-    void testGenerate生成不同值() {
+    void testGenerateReturnsDifferentValues() {
         Set<String> clientIds = new HashSet<>();
         // 生成100个不同的clientId
         for (int i = 0; i < 100; i++) {

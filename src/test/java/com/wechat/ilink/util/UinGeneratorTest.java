@@ -14,21 +14,21 @@ import static org.junit.jupiter.api.Assertions.*;
 class UinGeneratorTest {
 
     @Test
-    void testGenerate返回非空字符串() {
+    void testGenerateReturnsNonEmptyString() {
         String uin = UinGenerator.generate();
         assertNotNull(uin);
         assertFalse(uin.isEmpty());
     }
 
     @Test
-    void testGenerate返回Base64编码() {
+    void testGenerateReturnsBase64Encoded() {
         String uin = UinGenerator.generate();
         // Base64解码应该成功
         assertDoesNotThrow(() -> Base64.getDecoder().decode(uin));
     }
 
     @Test
-    void testGenerate生成不同值() {
+    void testGenerateReturnsDifferentValues() {
         Set<String> uins = new HashSet<>();
         // 生成100个不同的uin
         for (int i = 0; i < 100; i++) {

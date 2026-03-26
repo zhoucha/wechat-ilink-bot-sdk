@@ -20,13 +20,13 @@ class ContextTokenCacheTest {
     }
 
     @Test
-    void testGet不存在的Key返回Null() {
+    void testGetReturnsNullForNonExistentKey() {
         ContextTokenCache cache = new ContextTokenCache();
         assertNull(cache.get("nonexistent"));
     }
 
     @Test
-    void testGetOrThrow存在返回Token() {
+    void testGetOrThrowReturnsTokenWhenExists() {
         ContextTokenCache cache = new ContextTokenCache();
         cache.put("user123", "token456");
 
@@ -36,7 +36,7 @@ class ContextTokenCacheTest {
     }
 
     @Test
-    void testGetOrThrow不存在抛出异常() {
+    void testGetOrThrowThrowsExceptionWhenNotExists() {
         ContextTokenCache cache = new ContextTokenCache();
 
         assertThrows(IllegalStateException.class, () -> {
@@ -78,7 +78,7 @@ class ContextTokenCacheTest {
     }
 
     @Test
-    void testPutNullUserId不抛异常() {
+    void testPutNullUserIdDoesNotThrow() {
         ContextTokenCache cache = new ContextTokenCache();
 
         assertDoesNotThrow(() -> cache.put(null, "token"));
@@ -86,7 +86,7 @@ class ContextTokenCacheTest {
     }
 
     @Test
-    void testPutNullToken不抛异常() {
+    void testPutNullTokenDoesNotThrow() {
         ContextTokenCache cache = new ContextTokenCache();
 
         assertDoesNotThrow(() -> cache.put("user", null));

@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class WechatMessageTest {
 
     @Test
-    void testConstructor初始化空ItemList() {
+    void testConstructorInitializesEmptyItemList() {
         WechatMessage message = new WechatMessage();
         assertNotNull(message.getItemList());
         assertTrue(message.getItemList().isEmpty());
@@ -32,7 +32,7 @@ class WechatMessageTest {
     }
 
     @Test
-    void testIsUserMessage返回True当消息类型为User() {
+    void testIsUserMessageReturnsTrueWhenTypeIsUser() {
         WechatMessage message = new WechatMessage();
         message.setMessageType(MessageType.USER);
 
@@ -40,7 +40,7 @@ class WechatMessageTest {
     }
 
     @Test
-    void testIsUserMessage返回False当消息类型为Bot() {
+    void testIsUserMessageReturnsFalseWhenTypeIsBot() {
         WechatMessage message = new WechatMessage();
         message.setMessageType(MessageType.BOT);
 
@@ -48,14 +48,14 @@ class WechatMessageTest {
     }
 
     @Test
-    void testIsUserMessage返回False当消息类型为Null() {
+    void testIsUserMessageReturnsFalseWhenTypeIsNull() {
         WechatMessage message = new WechatMessage();
 
         assertFalse(message.isUserMessage());
     }
 
     @Test
-    void testExtractTextContent返回文本内容() {
+    void testExtractTextContentReturnsTextContent() {
         WechatMessage message = new WechatMessage();
         List<MessageItem> items = new ArrayList<>();
         items.add(MessageItem.createText("Hello World"));
@@ -65,7 +65,7 @@ class WechatMessageTest {
     }
 
     @Test
-    void testExtractTextContent返回空字符串当ItemList为空() {
+    void testExtractTextContentReturnsEmptyStringWhenItemListEmpty() {
         WechatMessage message = new WechatMessage();
         message.setItemList(new ArrayList<>());
 
@@ -73,7 +73,7 @@ class WechatMessageTest {
     }
 
     @Test
-    void testExtractTextContent返回空字符串当ItemList为Null() {
+    void testExtractTextContentReturnsEmptyStringWhenItemListNull() {
         WechatMessage message = new WechatMessage();
         message.setItemList(null);
 
@@ -81,7 +81,7 @@ class WechatMessageTest {
     }
 
     @Test
-    void testExtractTextContent返回第一个非空文本() {
+    void testExtractTextContentReturnsFirstNonEmptyText() {
         WechatMessage message = new WechatMessage();
         List<MessageItem> items = new ArrayList<>();
         items.add(MessageItem.createText("First text"));
@@ -92,7 +92,7 @@ class WechatMessageTest {
     }
 
     @Test
-    void testGetSenderName返回用户名当包含At符号() {
+    void testGetSenderNameReturnsUsernameWhenContainsAtSymbol() {
         WechatMessage message = new WechatMessage();
         message.setFromUserId("user123@im.wechat");
 
@@ -100,7 +100,7 @@ class WechatMessageTest {
     }
 
     @Test
-    void testGetSenderName返回原始值当不包含At符号() {
+    void testGetSenderNameReturnsOriginalValueWhenNoAtSymbol() {
         WechatMessage message = new WechatMessage();
         message.setFromUserId("user123");
 
@@ -108,7 +108,7 @@ class WechatMessageTest {
     }
 
     @Test
-    void testGetSenderName返回空字符串当FromUserId为Null() {
+    void testGetSenderNameReturnsEmptyStringWhenFromUserIdNull() {
         WechatMessage message = new WechatMessage();
 
         assertEquals("", message.getSenderName());

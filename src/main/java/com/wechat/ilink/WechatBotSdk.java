@@ -189,7 +189,7 @@ public class WechatBotSdk implements AutoCloseable {
      */
     public boolean sendTextMessage(String toUserId, String content) throws IOException {
         if (!isAuthenticated()) {
-            throw new IllegalStateException("Not authenticated. Please login first.");
+            throw new IllegalStateException("微信未登录,请先扫码二维码登录");
         }
         return messageSender.sendTextMessage(toUserId, content);
     }

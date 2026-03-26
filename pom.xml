@@ -20,9 +20,23 @@
         <slf4j.version>2.0.17</slf4j.version>
         <logback.version>1.5.32</logback.version>
         <jackson.version>3.1.0</jackson.version>
+        <zxing.version>3.5.2</zxing.version>
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>${zxing.version}</version>
+        </dependency>
+        <!-- ZXing JavaSE扩展（用于生成图片） -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+            <version>${zxing.version}</version>
+        </dependency>
+
         <!-- Apache HttpClient 5 -->
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
