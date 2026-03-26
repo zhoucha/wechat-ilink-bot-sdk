@@ -1,0 +1,98 @@
+## 技术框架
+
+采用 java实现，  具体框架如下  java25,  apache httpclient5
+
+## 微信 ilink API 协议实现细节分析总结
+
+### 一、扫码登录完整流程
+
+#### **阶段1: 启动初始化**
+
+- 检查已保存凭据,避免重复扫码
+- 无凭据则启动扫码登录流程
+
+#### **阶段2: 获取并显示二维码**
+
+- 调用 `GET ilink/bot/get_bot_qrcode?bot_type=3`
+- 使用 `qrcode-terminal` 在终端显示 ASCII 二维码
+- 输出到 stderr (避免干扰 MCP stdout)
+
+#### **阶段3: 轮询扫码状态**
+
+- 轮询间隔: 1秒
+- 总超时: 8分钟
+- 状态流转: wait → scaned → confirmed
+- 确认后保存凭据到自定义配置目录
+
+### 二、消息监听机制
+
+#### **长轮询实现**
+
+- 35秒超时的长轮询
+- 使用 `get_updates_buf` 实现增量同步
+- 支持断点续传 (持久化 sync_buf.txt)
+
+#### **消息处理流程**
+
+- 过滤用户消息 (message_type=1)
+- 提取文本/语音内容
+- 缓存 context_token 用于回复
+- 通过 MCP 通知推送到 Claude Code
+
+#### **错误重试策略**
+
+- 连续失败 < 3次: 等待2秒
+- 连续失败 >= 3次: 等待30秒退避
+
+### 三、消息发送机制
+
+#### **回复工具调用**
+
+- Claude 调用 `wechat_reply` 工具
+- 获取缓存的 context_token
+- 调用 `POST ilink/bot/sendmessage`
+
+#### **消息构造**
+
+- 生成唯一 client_id
+- message_type=2 (Bot消息)
+- message_state=2 (完成状态)
+- 15秒超时设置
+
+### 四、关键技术实现
+
+#### **认证头设计**
+
+- `X-WECHAT-UIN`: 每次随机生成 (base64编码)
+- `AuthorizationType`: 固定 `ilink_bot_token`
+- `Authorization`: Bearer Token 认证
+
+#### **消息内容提取**
+
+- 支持文本消息 (type=1)
+- 支持语音消息 (type=3,已转文字)
+- 支持引用消息解析
+
+#### **Context Token 缓存**
+
+- 内存 Map 缓存
+- Key: from_user_id
+- Value: context_token
+- 回复时必须使用对应 token
+
+### 五、安全性设计
+
+- 凭据文件权限 600 (仅所有者可读写)
+- 随机标识生成 (UIN、client_id)
+- Bearer Token 认证机制
+
+### 六、配置参数汇总
+
+| 参数         | 值    | 用途         |
+| ------------ | ----- | ------------ |
+| 长轮询超时   | 35秒  | 消息接收     |
+| 发送超时     | 15秒  | 消息发送     |
+| 扫码超时     | 8分钟 | 二维码有效期 |
+| 轮询间隔     | 1秒   | 状态查询     |
+| 最大失败次数 | 3次   | 重试阈值     |
+| 退避延迟     | 30秒  | 失败退避     |
