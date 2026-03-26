@@ -12,6 +12,7 @@ import com.wechat.ilink.model.auth.Credentials;
 import com.wechat.ilink.model.message.WechatMessage;
 import com.wechat.ilink.model.response.QrcodeResponse;
 import com.wechat.ilink.persistence.CredentialsStore;
+import com.wechat.ilink.persistence.Store;
 import com.wechat.ilink.persistence.SyncBufferStore;
 import com.wechat.ilink.sender.MessageSenderService;
 import org.slf4j.Logger;
@@ -54,7 +55,7 @@ public class WechatBotSdk implements AutoCloseable {
     private static final Logger logger = LoggerFactory.getLogger(WechatBotSdk.class);
 
     private final SdkConfig config;
-    private final CredentialsStore credentialsStore;
+    private final Store credentialsStore;
     private final SyncBufferStore syncBufferStore;
     private final ContextTokenCache contextTokenCache;
     private final IlinkApiClient apiClient;

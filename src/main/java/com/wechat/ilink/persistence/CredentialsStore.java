@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * 凭据存储
  */
-public class CredentialsStore {
+public class CredentialsStore implements Store {
 
     private final Path credentialsFile;
     private final ObjectMapper objectMapper;
@@ -42,13 +42,12 @@ public class CredentialsStore {
     /**
      * 保存凭据
      */
+    @Override
     public void save(Credentials credentials) throws IOException {
         // 确保目录存在
         Files.createDirectories(credentialsFile.getParent());
-
         // 写入文件
         objectMapper.writeValue(credentialsFile.toFile(), credentials);
-
         // 设置文件权限为600（仅所有者可读写）
         try {
             Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rw-------");
@@ -61,6 +60,7 @@ public class CredentialsStore {
     /**
      * 加载凭据
      */
+    @Override
     public Credentials load() throws IOException {
         if (!Files.exists(credentialsFile)) {
             return null;
@@ -71,6 +71,7 @@ public class CredentialsStore {
     /**
      * 清除凭据
      */
+    @Override
     public void clear() throws IOException {
         if (Files.exists(credentialsFile)) {
             Files.delete(credentialsFile);
@@ -80,6 +81,7 @@ public class CredentialsStore {
     /**
      * 检查凭据是否存在
      */
+    @Override
     public boolean exists() {
         return Files.exists(credentialsFile);
     }
