@@ -49,7 +49,7 @@ public class SyncBufferStore {
     private String loadFromFile() {
         try {
             if (Files.exists(bufferFile)) {
-                return new String(Files.readAllBytes(bufferFile), java.nio.charset.StandardCharsets.UTF_8);
+                return Files.readString(bufferFile);
             }
         } catch (IOException e) {
             // 忽略加载错误，返回空字符串
@@ -59,6 +59,6 @@ public class SyncBufferStore {
 
     private void saveToFile() throws IOException {
         Files.createDirectories(bufferFile.getParent());
-        Files.write(bufferFile, buffer.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        Files.writeString(bufferFile, buffer);
     }
 }

@@ -83,8 +83,4 @@ public class CredentialsStore {
     public boolean exists() {
         return Files.exists(credentialsFile);
     }
-
-    public Path getCredentialsFile() {
-        return credentialsFile;
-    }
 }
