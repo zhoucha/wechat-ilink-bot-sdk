@@ -40,9 +40,7 @@ public class MessageSenderService {
         String contextToken = contextTokenCache.getOrThrow(toUserId);
         WechatMessage msg = WechatMessage.createReply(toUserId, content, contextToken);
         SendMessageRequest request = new SendMessageRequest(msg);
-
         ApiResponse response = apiClient.sendMessage(request, Duration.ofMillis(config.getSendTimeoutMs()));
-
         if (response.isSuccess()) {
             logger.debug("Message sent to {} successfully", toUserId);
             return true;
