@@ -8,7 +8,7 @@ import com.wechat.ilink.exception.ApiException;
 import com.wechat.ilink.exception.AuthException;
 import com.wechat.ilink.exception.QrcodeTimeoutException;
 import com.wechat.ilink.listener.MessageListener;
-import com.wechat.ilink.listener.MessageListenerService;
+import com.wechat.ilink.listener.MessageReceiverService;
 import com.wechat.ilink.model.auth.Credentials;
 import com.wechat.ilink.model.message.WechatMessage;
 import com.wechat.ilink.model.response.QrcodeResponse;
@@ -62,7 +62,7 @@ public class WechatBotSdk implements AutoCloseable {
     private final IlinkApiClient apiClient;
     private final QrcodeLoginManager loginManager;
 
-    private final MessageListenerService messageListener;
+    private final MessageReceiverService messageListener;
 
     private final MessageSenderService messageSender;
 
@@ -97,7 +97,7 @@ public class WechatBotSdk implements AutoCloseable {
 
         // 初始化服务
         this.loginManager = new QrcodeLoginManager(apiClient, config);
-        this.messageListener = new MessageListenerService(apiClient, config, syncBufferStore, contextTokenCache);
+        this.messageListener = new MessageReceiverService(apiClient, config, syncBufferStore, contextTokenCache);
         this.messageSender = new MessageSenderService(apiClient, config, contextTokenCache);
     }
 

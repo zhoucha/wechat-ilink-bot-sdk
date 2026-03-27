@@ -18,9 +18,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * 消息监听服务
  */
-public class MessageListenerService implements AutoCloseable {
+public class MessageReceiverService implements AutoCloseable {
 
-    private static final Logger logger = LoggerFactory.getLogger(MessageListenerService.class);
+    private static final Logger logger = LoggerFactory.getLogger(MessageReceiverService.class);
 
     private final IlinkApiClient apiClient;
     private final SdkConfig config;
@@ -31,7 +31,7 @@ public class MessageListenerService implements AutoCloseable {
     private Thread listenerThread;
     private int consecutiveFailures = 0;
 
-    public MessageListenerService(IlinkApiClient apiClient, SdkConfig config, SyncBufferStore syncBufferStore, ContextTokenCache contextTokenCache) {
+    public MessageReceiverService(IlinkApiClient apiClient, SdkConfig config, SyncBufferStore syncBufferStore, ContextTokenCache contextTokenCache) {
         this.apiClient = apiClient;
         this.config = config;
         this.syncBufferStore = syncBufferStore;

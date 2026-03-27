@@ -1,7 +1,7 @@
 package com.wechat.ilink.api;
 
 import com.wechat.ilink.exception.ApiException;
-import com.wechat.ilink.http.HttpClientWrapper;
+import com.wechat.ilink.util.http.HttpClientWrapper;
 import com.wechat.ilink.model.auth.Credentials;
 import com.wechat.ilink.model.request.GetUpdatesRequest;
 import com.wechat.ilink.model.request.SendMessageRequest;

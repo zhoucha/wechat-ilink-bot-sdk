@@ -1,4 +1,4 @@
-package com.wechat.ilink.http;
+package com.wechat.ilink.util.http;
 
 import com.wechat.ilink.exception.ApiException;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
