@@ -3,6 +3,7 @@ package com.wechat.ilink.listener;
 import com.wechat.ilink.api.IlinkApiClient;
 import com.wechat.ilink.cache.ContextTokenCache;
 import com.wechat.ilink.config.SdkConfig;
+import com.wechat.ilink.exception.ApiException;
 import com.wechat.ilink.model.message.WechatMessage;
 import com.wechat.ilink.model.request.GetUpdatesRequest;
 import com.wechat.ilink.model.response.GetUpdatesResponse;
@@ -10,6 +11,8 @@ import com.wechat.ilink.persistence.SyncBufferStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,20 +89,13 @@ public class MessageReceiverService implements AutoCloseable {
             try {
                 String currentBuffer = syncBufferStore.getBuffer();
                 GetUpdatesRequest request = new GetUpdatesRequest(currentBuffer, SdkConfig.CHANNEL_VERSION);
-
-                GetUpdatesResponse response = apiClient.getUpdates(
-                        request,
-                        Duration.ofMillis(config.getLongPollingTimeoutMs())
-                );
-
+                GetUpdatesResponse response = apiClient.getUpdates(request, Duration.ofMillis(config.getLongPollingTimeoutMs()) );
                 if (response.isSuccess()) {
                     consecutiveFailures = 0;
-
                     // 保存新的同步缓冲区
                     if (response.getGetUpdatesBuf() != null) {
                         syncBufferStore.updateBuffer(response.getGetUpdatesBuf());
                     }
-
                     // 处理消息
                     if (response.getMsgs() != null && !response.getMsgs().isEmpty()) {
                         List<WechatMessage> userMessages = new ArrayList<>();
@@ -119,17 +115,59 @@ public class MessageReceiverService implements AutoCloseable {
                         }
                     }
                 } else {
-                    handleFailure(new Exception("Api 错误: " + response.getErrorInfo()));
+                    handleFailure(new ApiException("Api 错误: " + response.getErrorInfo()));
                 }
 
+            } catch (java.net.SocketTimeoutException | org.apache.hc.core5.http.ConnectionRequestTimeoutException | HttpTimeoutException e) {
+                logger.warn("长轮询超时: {}", e.getMessage());
+                // 长轮询超时是正常的
+                notifyPollingTimeout();
             } catch (Exception e) {
-                if (isTimeoutException(e)) {
-                    // 长轮询超时是正常的
-                    notifyPollingTimeout();
-                } else {
-                    handleFailure(e);
-                }
+                handleFailure(e);
             }
+        }
+    }
+
+
+    private void fetchAndProcessUpdates() throws ApiException, IOException {
+        String currentBuffer = syncBufferStore.getBuffer();
+        GetUpdatesRequest request = new GetUpdatesRequest(currentBuffer, SdkConfig.CHANNEL_VERSION);
+
+        GetUpdatesResponse response = apiClient.getUpdates(
+                request,
+                Duration.ofMillis(config.getLongPollingTimeoutMs())
+        );
+        if (response.isSuccess()) {
+            processSuccessfulResponse(response);
+        } else {
+            // 将 API 错误也作为异常抛出，由外层统一处理
+            throw new ApiException("Api 错误: " + response.getErrorInfo());
+        }
+    }
+
+    private void processSuccessfulResponse(GetUpdatesResponse response) throws IOException {
+        // 重置失败计数器
+        consecutiveFailures = 0;
+
+        if (response.getGetUpdatesBuf() != null) {
+            syncBufferStore.updateBuffer(response.getGetUpdatesBuf());
+        }
+
+        if (response.getMsgs() != null) {
+            List<WechatMessage> userMessages = response.getMsgs().stream()
+                    .filter(WechatMessage::isUserMessage)
+                    .peek(this::cacheContextToken)
+                    .toList();
+
+            if (!userMessages.isEmpty()) {
+                notifyMessagesReceived(userMessages);
+            }
+        }
+    }
+
+    private void cacheContextToken(WechatMessage msg) {
+        if (msg.getContextToken() != null && msg.getFromUserId() != null) {
+            contextTokenCache.put(msg.getFromUserId(), msg.getContextToken());
         }
     }
 
