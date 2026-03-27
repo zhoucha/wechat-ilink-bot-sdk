@@ -21,15 +21,15 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * 扫码登录管理器
  */
-public class QrcodeLoginManager {
-    private static final Logger logger = LoggerFactory.getLogger(QrcodeLoginManager.class);
+public class LoginManager {
+    private static final Logger logger = LoggerFactory.getLogger(LoginManager.class);
     private final IlinkApiClient apiClient;
     private final SdkConfig config;
 
     private final ScheduledExecutorService executor;
 
 
-    public QrcodeLoginManager(IlinkApiClient apiClient, SdkConfig config) {
+    public LoginManager(IlinkApiClient apiClient, SdkConfig config) {
         this.apiClient = apiClient;
         this.config = config;
         // this.executor = Executors.newSingleThreadScheduledExecutor();

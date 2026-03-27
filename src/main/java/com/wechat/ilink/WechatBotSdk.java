@@ -1,7 +1,7 @@
 package com.wechat.ilink;
 
 import com.wechat.ilink.api.IlinkApiClient;
-import com.wechat.ilink.auth.QrcodeLoginManager;
+import com.wechat.ilink.auth.LoginManager;
 import com.wechat.ilink.cache.ContextTokenCache;
 import com.wechat.ilink.config.SdkConfig;
 import com.wechat.ilink.exception.ApiException;
@@ -60,7 +60,7 @@ public class WechatBotSdk implements AutoCloseable {
     private final SyncBufferStore syncBufferStore;
     private final ContextTokenCache contextTokenCache;
     private final IlinkApiClient apiClient;
-    private final QrcodeLoginManager loginManager;
+    private final LoginManager loginManager;
 
     private final MessageReceiverService messageListener;
 
@@ -96,7 +96,7 @@ public class WechatBotSdk implements AutoCloseable {
         loadCredentials();
 
         // 初始化服务
-        this.loginManager = new QrcodeLoginManager(apiClient, config);
+        this.loginManager = new LoginManager(apiClient, config);
         this.messageListener = new MessageReceiverService(apiClient, config, syncBufferStore, contextTokenCache);
         this.messageSender = new MessageSenderService(apiClient, config, contextTokenCache);
     }
@@ -135,7 +135,7 @@ public class WechatBotSdk implements AutoCloseable {
      * @param callback    状态回调（可为null）
      * @return 登录凭据
      */
-    public Credentials loginWithQrcode(String qrcodeToken, QrcodeLoginManager.QrcodeStatusCallback callback)
+    public Credentials loginWithQrcode(String qrcodeToken, LoginManager.QrcodeStatusCallback callback)
             throws IOException, InterruptedException, AuthException, QrcodeTimeoutException {
         Credentials credentials = loginManager.pollQrcodeStatus(qrcodeToken, callback);
 

@@ -1,7 +1,7 @@
 package com.wechat.ilink.example;
 
 import com.wechat.ilink.WechatBotSdk;
-import com.wechat.ilink.auth.QrcodeLoginManager;
+import com.wechat.ilink.auth.LoginManager;
 import com.wechat.ilink.listener.SimpleMessageListener;
 import com.wechat.ilink.model.auth.Credentials;
 import com.wechat.ilink.model.message.WechatMessage;
@@ -31,7 +31,7 @@ public class BotExample {
                 System.out.println(qrcode.getQrcodeImgContent());
 
                 // 等待用户扫码确认
-                Credentials credentials = sdk.loginWithQrcode(qrcode.getQrcode(), new QrcodeLoginManager.QrcodeStatusCallback() {
+                Credentials credentials = sdk.loginWithQrcode(qrcode.getQrcode(), new LoginManager.QrcodeStatusCallback() {
                     @Override
                     public void onStatusChanged(QrcodeStatus status, QrcodeStatusResponse response) {
                         System.out.println("Status changed: " + status.getDescription());
